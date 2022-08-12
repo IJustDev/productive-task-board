@@ -1,0 +1,36 @@
+@use 'sass:map';
+
+h3 {
+color: #181818;
+}
+
+ak-board {
+    .board {
+        background-color: #fafafa;
+    }
+}
+
+ak-card {
+    .card {
+        background-color: white;
+        cursor: pointer;
+    }
+}
+
+ak-tag {
+    .tag {
+        background-color: #f6e7fa;
+        color: #e263ba;
+        font-size: 10px;
+        font-weight: bolder;
+    }
+}
+
+ak-user-profile {
+    .user-profile {
+        background-color: #e5ecff;
+        color: #3a3eb4;
+        border: none !important;
+        font-size: 10px;
+    }
+}

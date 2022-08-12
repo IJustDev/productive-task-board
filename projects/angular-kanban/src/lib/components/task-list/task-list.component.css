@@ -1,0 +1,11 @@
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0;
+    list-style-type: none;
+}
+
+.task-list>ak-card {
+    display: flex;
+}

@@ -1,0 +1,40 @@
+@use 'sass:map';
+
+.footer {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+}
+
+.project {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.card {
+    border-radius: 5px;
+    box-shadow: 3px 3px 7px 3px rgba(0, 0, 0, 0.12);
+    padding: 15px;
+    max-width: 300px;
+}
+
+.ticketId {
+    font-weight: bolder;
+    font-size: 16px;
+}
+
+.tags {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 4px;
+}
+
+.tags>ak-tag {
+    display: flex;
+}
+
+.content {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}

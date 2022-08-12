@@ -28,7 +28,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "projects/angular-kanban/src/lib/styles/angular-kanban.scss"
             ],
             "scripts": []
           },
@@ -96,9 +97,41 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "projects/angular-kanban/src/lib/components/styles/theming.scss"
             ],
             "scripts": []
+          }
+        }
+      }
+    },
+    "angular-kanban": {
+      "projectType": "library",
+      "root": "projects/angular-kanban",
+      "sourceRoot": "projects/angular-kanban/src",
+      "prefix": "ak",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/angular-kanban/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/angular-kanban/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/angular-kanban/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/angular-kanban/src/test.ts",
+            "tsConfig": "projects/angular-kanban/tsconfig.spec.json",
+            "karmaConfig": "projects/angular-kanban/karma.conf.js"
           }
         }
       }
