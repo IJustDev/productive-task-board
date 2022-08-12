@@ -1,6 +1,6 @@
 <ak-board>
-  <ak-task-list [name]="'Open'">
-    <ak-card [ticketId]="task.projectName + ' - ' + task.ticketId" *ngFor="let task of tasks">
+  <ak-task-list [name]="tasklist.name + '-' + tasklist.totalRemaining" *ngFor="let tasklist of taskLists">
+    <ak-card [ticketId]="task.projectName + ' - ' + task.ticketId" *ngFor="let task of tasklist.tasks">
       <ng-container tags>
         <ak-tag *ngFor="let tag of task.tags" [text]="tag"></ak-tag>
         <ak-tag [text]="task.projectName"></ak-tag>
@@ -8,10 +8,11 @@
 
       <h3>{{task.title}}</h3>
 
-      {{task.shortDescription}}
+      <span [innerHtml]="task.shortDescription"></span>
 
       <ng-container footer>
-        <ak-user-profile [initials]="task.assigneeName"></ak-user-profile>
+        <ak-user-profile [name]="task.assigneeName" *ngIf="task.assigneeName"></ak-user-profile>
+        <span>{{task.remainingTime}}m</span>
       </ng-container>
     </ak-card>
   </ak-task-list>

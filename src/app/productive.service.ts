@@ -10,11 +10,12 @@ export type Task = {
   shortDescription: string;
   tags: string[];
   projectName: string;
+  remainingTime: number;
 };
 
 const credentials = {
-  organizationId: '',
-  token: '',
+  organizationId: '20054',
+  token: '8720ec5a-87d2-486d-92fb-69e54a204d40',
 };
 
 @Injectable({
@@ -28,34 +29,24 @@ export class ProductiveService {
     this._populator = new Populator(this);
   }
 
-  public getTasks(): Observable<Task[]> {
-    return this._http.get(this._baseUrl + "tasks", { headers: this._httpHeader })
-      .pipe(
-        map((response: any) => {
-          return response.data;
-        }),
-        switchMap((result: any[]) => {
-          // return result.map(c => ({...c, populatedData: this._populator.populate(c as PopulatableModel)}));
-          return zip(result.map(c =>
-          (this._populator.populate(c as PopulatableModel).pipe(
-            map((populatedData: any) => {
-              return { ...c, populatedData }
-            }),
-          )
-          )));
-        }),
-        map((data: any) => {
-          console.log(data);
-          const result = data.map((c: any) => ({
-            shortDescription: c.attributes.description.replace(/(?:\r\n|\r|\n)/g, '<br />'),
-            title: c.attributes.title,
-            ticketId: c.attributes.number,
-            assigneeName: 'AP',
-            projectName: c.populatedData.name,
-          } as Task));
+  public getTasks(filter?: string): Observable<any[]> {
+      const response = this._http.get(this._baseUrl + "tasks?" + filter, { headers: this._httpHeader }).pipe(map((response: any) => {
+        return response.data;
+      }));
 
-          return result;
-        }),
+      return this._populator.populateMultiple(response).pipe(
+        map((tasks) => {
+          const x = tasks.map((task: any) => ({
+            assigneeName: task.populatedData.find((c: any) => c.type == 'assignee')?.name,
+            projectName: task.populatedData.find((c: any) => c.type == 'project')?.name,
+            shortDescription: task.attributes.description,
+            tags: task.attributes.tags ?? [],
+            ticketId: task.attributes.number,
+            title: task.attributes.title,
+            remainingTime: task.attributes.remaining_time,
+          } as Task));
+          return x;
+        })
       );
   }
 

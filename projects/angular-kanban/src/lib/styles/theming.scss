@@ -1,7 +1,11 @@
 @use 'sass:map';
+* {
+    font-size: 16px;
+}
 
 h3 {
-color: #181818;
+    color: #181818;
+    font-size: 20px;
 }
 
 ak-board {

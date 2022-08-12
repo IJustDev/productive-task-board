@@ -7,8 +7,12 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class UserProfileComponent implements OnInit {
 
+  public initials: string = '';
+
   @Input()
-  public initials!: string;
+  public set name(value: string) {
+    this.initials = value.split(" ").map(c => c.charAt(0)).join('');
+  }
 
   constructor() { }
 

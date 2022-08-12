@@ -1,29 +1,54 @@
-import { map, Observable, of, tap } from "rxjs";
+import { map, Observable, of, switchMap, tap, zip } from "rxjs";
 import { People, Project } from "./models";
 import { ProductiveService } from "./productive.service";
 
 export type PopulationCache = { [type: string]: { [id: string]: any } };
-export type PopulatableModel = { relationships: { [name: string]: { data: { type: string, id: string } } } };
+export type PopulatableModel = { relationships: { [name: string]: { data: { type: string, id: string } } }, populatedData: any[] };
 
 export class Populator {
     private _adapters: { [key: string]: CachedPopulationAdapterBase<any> } = {};
 
     constructor(protected _productiveService: ProductiveService, private _cache: PopulationCache = {}) {
-        this._adapters['projects'] = new ProjectPopulationAdapter(this._productiveService);
+        this._adapters['project'] = new ProjectPopulationAdapter(this._productiveService);
+        this._adapters['assignee'] = new PeoplePopulationAdapter(this._productiveService);
     }
 
-    public populate(model: PopulatableModel): Observable<any> {
-        const relationShipData = Object.keys(model.relationships).map(typeName => model.relationships[typeName].data);
+    public populateMultiple(modelObservables: Observable<PopulatableModel[]>): Observable<any> {
+        return modelObservables.pipe(
+            switchMap((models: PopulatableModel[]) => {
+                const observables = models.map(model => this.populate(of(model)));
+                return zip(...observables);
+            })
+        )
+    }
 
-        for (const relationShip of relationShipData) {
-            if (!(relationShip.type in this._adapters)) continue;
+    public populate(modelObservable: Observable<PopulatableModel>): Observable<any> {
+        return modelObservable.pipe(
+            switchMap((model: PopulatableModel) => {
+                
+                const observables = [];
+                
+                const relationShipKeys = Object.keys(model.relationships);
 
-            const adapter: CachedPopulationAdapterBase<any> = this._adapters[relationShip.type];
+                for (const relationShipKey of relationShipKeys) {
+                    if (!(relationShipKey in this._adapters)) continue;
 
-            return adapter.populateWithCache(relationShip.id, this._cache);
-        }
+                    const relationShip = model.relationships[relationShipKey].data;
+                    if (relationShip == null) continue;
 
-        return of([]);
+                    const adapter: CachedPopulationAdapterBase<any> = this._adapters[relationShipKey];
+
+                    observables.push(adapter.populateWithCache(relationShip.id, this._cache, relationShipKey));
+                }
+
+                return zip(observables).pipe(
+                    map((populatedData: any[]) => {
+                        model.populatedData = populatedData;
+                        return model;
+                    })
+                );
+            }),
+        )
     }
 }
 
@@ -37,23 +62,26 @@ export abstract class PopulationAdapterBase<T> {
 
 export abstract class CachedPopulationAdapterBase<T> extends PopulationAdapterBase<T> {
 
-    public populateWithCache(id: string, cache: PopulationCache): Observable<T> {
+    public populateWithCache(id: string, cache: PopulationCache, type: string): Observable<T> {
         try {
             const cachedValue = cache[this.type][id];
             return of(cachedValue);
         } catch {
             const resultObservable = this.populate(id);
-            return this._cacheResultPipe(resultObservable, id, cache);
+            return this._cacheResultPipe(resultObservable, id, cache, type);
         }
     }
 
-    private _cacheResultPipe(observable: Observable<T>, id: string, cache: PopulationCache): Observable<T> {
+    private _cacheResultPipe(observable: Observable<T>, id: string, cache: PopulationCache, type: string): Observable<T> {
         return observable.pipe(
             tap((result: T) => {
                 if (!(this.type in cache)) {
                     cache[this.type] = {};
                 }
                 cache[this.type][id] = result;
+            }),
+            map((result: T) => {
+                return {...result, type: type } as T;
             })
         );
     }
@@ -67,9 +95,9 @@ export class ProjectPopulationAdapter extends CachedPopulationAdapterBase<Projec
 
     public override populate(id: string): Observable<Project> {
         return this._productiveService.getProject(id)
-        .pipe(
-            map((result: any) => ({id, name: result.data.attributes.name} as Project))
-        );
+            .pipe(
+                map((result: any) => ({ id, name: result.data.attributes.name } as Project))
+            );
     }
 }
 
@@ -81,8 +109,11 @@ export class PeoplePopulationAdapter extends CachedPopulationAdapterBase<People>
 
     public override populate(id: string): Observable<People> {
         return this._productiveService.getAssignee(id)
-        .pipe(
-            map((result: any) => ({id, name: result.data.attributes.name} as People))
-        );
+            .pipe(
+                map((result: any) => ({
+                    id,
+                    name: result.data.attributes.first_name + " " + result.data.attributes.last_name
+                } as People))
+            );
     }
 }
