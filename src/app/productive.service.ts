@@ -1,6 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, of, switchMap, tap, zip, zipAll } from 'rxjs';
+import { CacheService } from './cache.service';
 import { PopulatableModel, Populator } from './populator';
 
 export type Task = {
@@ -25,16 +26,17 @@ export class ProductiveService {
 
   private _populator: Populator;
 
-  constructor(private _http: HttpClient) {
+  constructor(private _http: HttpClient, private _cacheService: CacheService) {
     this._populator = new Populator(this);
   }
 
   public getTasks(filter?: string): Observable<any[]> {
-      const response = this._http.get(this._baseUrl + "tasks?" + filter, { headers: this._httpHeader }).pipe(map((response: any) => {
+      const endpoint = "tasks?" + filter;
+      const response = this._http.get(this._baseUrl + endpoint, { headers: this._httpHeader }).pipe(map((response: any) => {
         return response.data;
       }));
 
-      return this._populator.populateMultiple(response).pipe(
+      const request = this._populator.populateMultiple(response).pipe(
         map((tasks) => {
           const x = tasks.map((task: any) => ({
             assigneeName: task.populatedData.find((c: any) => c.type == 'assignee')?.name,
@@ -48,6 +50,8 @@ export class ProductiveService {
           return x;
         })
       );
+
+      return this._cacheService.readOrFetch(endpoint, request, 90);
   }
 
   public getProject(id: string): Observable<any> {
