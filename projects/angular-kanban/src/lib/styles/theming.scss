@@ -73,3 +73,32 @@ ak-user-profile {
         font-size: 10px;
     }
 }
+
+button {
+    background-color: map.get($palette, "neutral-three");
+    padding: 15px 30px;
+    border: none;
+    color: map.get($palette, "neutral-one");
+    font-weight: 500;
+    cursor: pointer;
+    @include all-transition();
+
+    &:hover {
+        background-color: map.get($palette, "accent");
+        @include all-transition();
+    }
+}
+
+input {
+    border: none;
+    margin: 0;
+    padding: 15px;
+    border-bottom: 1px solid map.get($palette, "neutral-one");
+    @include all-transition();
+}
+
+input:focus {
+    outline: none;
+    border-bottom: 1px solid map.get($palette, "neutral-two");
+    @include all-transition();
+}

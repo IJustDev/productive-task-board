@@ -1,6 +1,6 @@
 import { transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
-import { map, tap, zip } from 'rxjs';
+import { BehaviorSubject, map, tap, zip } from 'rxjs';
 import { ProductiveService, Task } from './productive.service';
 
 @Component({
@@ -15,6 +15,22 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.getTaskLists();
+    this.filter$.subscribe((filter) => {
+      console.log("filter changed");
+      console.log(filter);
+      this.filterTaskLists();
+    })
+  }
+
+  public toggleMe() {
+
+    this.filter$.next((c) => {
+      return c.map((taskList: TaskList) => {
+        taskList.tasks = taskList.tasks.filter(c => c.assigneeName == 'Alexander Panov');
+
+        return taskList;
+      });
+    });
   }
 
   public getTaskLists() {
@@ -37,18 +53,39 @@ export class AppComponent implements OnInit {
     });
     zip(taskListObservables).pipe(tap((taskLists) => {
       this.taskLists = taskLists;
+      this.filterTaskLists();
     })).subscribe();
   }
 
   public taskLists: TaskList[] = [];
+  public filteredTaskLists: TaskList[] = [];
+
+  public filter$: BehaviorSubject<(c: TaskList[]) => TaskList[]> = new BehaviorSubject<any>((c: TaskList[]) => c);
 
   public moveTask(event: any) {
-    const item = event.item.data;
-    const targetContainer = this.taskLists.find((c: any) => c.name == event.container.data);
-    const sourceContainer = this.taskLists.find((c: any) => c.name == event.previousContainer.data);
-
-    console.log(event)
     transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+  }
+
+  public filterTaskLists() {
+    this.filteredTaskLists = this.filter$.value(this.taskLists);
+  }
+
+  public search(event: any) {
+    const query = ((event as HTMLInputElement).value);
+    if (query == '') {
+      this.filter$.next((c)=>c);
+      return;
+    }
+    this.filter$.next((c: TaskList[]) => {
+      const x = c.map((taskList: TaskList) => {
+        return {...taskList, tasks: taskList.tasks.filter((c: Task) => (
+          c.title.toLowerCase().indexOf(query.toLowerCase()) !== -1) ||
+          c.shortDescription.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          c.assigneeName?.toLowerCase() == query.toLowerCase()
+        )};
+      });
+      return x;
+    });
   }
 }
 

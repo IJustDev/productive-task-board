@@ -14,7 +14,7 @@ import { BoardComponent } from './components/board/board.component';
     ActionButtonComponent,
     TaskListComponent,
     TagComponent,
-    BoardComponent
+    BoardComponent,
   ],
   imports: [
     CommonModule,
