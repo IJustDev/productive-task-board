@@ -1,6 +1,12 @@
-<ak-board>
-  <ak-task-list [name]="tasklist.name + '-' + tasklist.totalRemaining" *ngFor="let tasklist of taskLists">
-    <ak-card [ticketId]="task.projectName + ' - ' + task.ticketId" *ngFor="let task of tasklist.tasks">
+
+<ak-board cdkDropListGroup>
+  <ng-container board-name>
+    <h1>Current sprint</h1>
+    <p>Here all tasks in the project. You will find information for
+      each as well as assignees responsible for completion</p>
+  </ng-container>
+  <ak-task-list [name]="tasklist.name" *ngFor="let tasklist of taskLists" cdkDropList [cdkDropListData]="tasklist" (cdkDropListDropped)="moveTask($event)" [sublabel]="'Remaining time: ' + tasklist.totalRemaining + 'm'">
+    <ak-card [ticketId]="task.projectName + ' - ' + task.ticketId" *ngFor="let task of tasklist.tasks" cdkDrag [cdkDragData]="task">
       <ng-container tags>
         <ak-tag *ngFor="let tag of task.tags" [text]="tag"></ak-tag>
         <ak-tag [text]="task.projectName"></ak-tag>
@@ -10,8 +16,8 @@
 
       <span [innerHtml]="task.shortDescription"></span>
 
+      <ak-user-profile [name]="task.assigneeName" *ngIf="task.assigneeName"></ak-user-profile>
       <ng-container footer>
-        <ak-user-profile [name]="task.assigneeName" *ngIf="task.assigneeName"></ak-user-profile>
         <span>{{task.remainingTime}}m</span>
       </ng-container>
     </ak-card>

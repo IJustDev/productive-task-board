@@ -1,30 +1,65 @@
 @use 'sass:map';
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;500;600;700;900&display=swap');
+
+@mixin all-transition {
+    transition: 0.10s all;
+}
+
 * {
-    font-size: 16px;
+    font-size: 14px;
+    color: map.get($palette, "text");
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+}
+
+h1 {
+    font-size: 40px;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: 700;
 }
 
 h3 {
-    color: #181818;
     font-size: 20px;
+    font-weight: 500;
 }
 
-ak-board {
-    .board {
-        background-color: #fafafa;
-    }
+h4 {
+    font-size: 16px;
+    font-weight: 500;
 }
 
 ak-card {
     .card {
-        background-color: white;
         cursor: pointer;
+        border-bottom: 1px solid map.get($palette, "neutral-two");
+        @include all-transition;
+
+        >* {
+            color: inherit;
+        }
     }
+
+    .card:hover {
+        @include all-transition;
+        background-color: map.get($palette, "neutral-one");
+        color: map.get($palette, "accent");
+    }
+
+}
+
+.cdk-drag-placeholder {
+    background-color: map.get($palette, "neutral-two");
+    color: transparent;
+    border-radius: 3px;
 }
 
 ak-tag {
     .tag {
-        background-color: #f6e7fa;
-        color: #e263ba;
+        background-color: map.get($palette, "neutral-one");
         font-size: 10px;
         font-weight: bolder;
     }
@@ -32,8 +67,8 @@ ak-tag {
 
 ak-user-profile {
     .user-profile {
-        background-color: #e5ecff;
-        color: #3a3eb4;
+        background-color: map.get($palette, "accent");
+        color: map.get($palette, "neutral-one");
         border: none !important;
         font-size: 10px;
     }

@@ -1,4 +1,7 @@
-<div class="board">
-    <ng-content></ng-content>
-</div>
+<div class="board-wrapper">
+    <ng-content select="[board-name]"></ng-content>
+    <div class="board">
+        <ng-content></ng-content>
+    </div>
 
+</div>

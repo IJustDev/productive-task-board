@@ -51,7 +51,7 @@ export class ProductiveService {
         })
       );
 
-      return this._cacheService.readOrFetch(endpoint, request, 90);
+      return this._cacheService.readOrFetch(endpoint, request, 180);
   }
 
   public getProject(id: string): Observable<any> {

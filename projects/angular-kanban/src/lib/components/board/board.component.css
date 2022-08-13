@@ -1,5 +1,7 @@
+.board-wrapper {
+    padding: 15px;
+}
 .board {
     display: flex;
     gap: 25px;
-    padding: 15px;
 }

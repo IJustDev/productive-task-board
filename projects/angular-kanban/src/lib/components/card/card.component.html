@@ -2,15 +2,17 @@
     <div class="tags">
         <ng-content select="[tags]"></ng-content>
     </div>
-    <div class="project">
-        <ng-content select="[project]"></ng-content>
-    </div>
     <span class="ticketId" *ngIf="ticketId">{{ticketId}}</span>
 
     <div class="content">
         <ng-content></ng-content>
     </div>
     <div class="footer">
-        <ng-content select="[footer]"></ng-content>
+        <div>
+            <ng-content select="[footer]"></ng-content>
+        </div>
+        <div class="user-profile">
+            <ng-content select="ak-user-profile"></ng-content>
+        </div>
     </div>
 </div>

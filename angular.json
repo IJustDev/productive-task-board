@@ -28,6 +28,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss",
               "projects/angular-kanban/src/lib/styles/angular-kanban.scss"
             ],
@@ -97,6 +98,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss",
               "projects/angular-kanban/src/lib/components/styles/theming.scss"
             ],

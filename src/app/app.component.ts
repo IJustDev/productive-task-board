@@ -1,3 +1,4 @@
+import { transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { map, tap, zip } from 'rxjs';
 import { ProductiveService, Task } from './productive.service';
@@ -18,9 +19,9 @@ export class AppComponent implements OnInit {
 
   public getTaskLists() {
     const taskListNames = [
-      'OPEN',
-      'IN PROGRESS',
-      'DONE'
+      'Open',
+      'In Progress',
+      'Done'
     ];
 
     const taskListObservables = taskListNames.map(taskListName => {
@@ -29,7 +30,7 @@ export class AppComponent implements OnInit {
           return ({
             name: taskListName,
             tasks,
-            totalRemaining: tasks.map(c => c.remainingTime).reduce((p, c) => p + c),
+            totalRemaining: tasks.map(c => c.remainingTime).reduce((p, c) => p + (c < 0 ? 0 : c)),
           });
         })
       )
@@ -40,6 +41,15 @@ export class AppComponent implements OnInit {
   }
 
   public taskLists: TaskList[] = [];
+
+  public moveTask(event: any) {
+    const item = event.item.data;
+    const targetContainer = this.taskLists.find((c: any) => c.name == event.container.data);
+    const sourceContainer = this.taskLists.find((c: any) => c.name == event.previousContainer.data);
+
+    console.log(event)
+    transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+  }
 }
 
 export type TaskList = { name: string, tasks: Task[], totalRemaining: number};
